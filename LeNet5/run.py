@@ -63,15 +63,17 @@ def test():
     net.eval()
     total_correct = 0
     avg_loss = 0.0
-    for i, (images, labels) in enumerate(data_test_loader):
-        output = net(images)
-        avg_loss += criterion(output, labels).sum()
-        # 计算准确率
-        pred = output.detach().max(1)[1]
-        total_correct += pred.eq(labels.view_as(pred)).sum()
+    # 取消梯度，避免测试阶段out of memory
+    with torch.no_grad():
+        for i, (images, labels) in enumerate(data_test_loader):
+            output = net(images)
+            avg_loss += criterion(output, labels).sum()
+            # 计算准确率
+            pred = output.detach().max(1)[1]
+            total_correct += pred.eq(labels.view_as(pred)).sum()
 
-    avg_loss /= len(data_test)
-    print('Test Avg. Loss: %f, Accuracy: %f' % (avg_loss.detach().cpu().item(), float(total_correct) / len(data_test)))
+        avg_loss /= len(data_test)
+        print('Test Avg. Loss: %f, Accuracy: %f' % (avg_loss.detach().cpu().item(), float(total_correct) / len(data_test)))
 
 
 def train_and_test(epoch):

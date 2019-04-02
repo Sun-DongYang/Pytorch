@@ -57,20 +57,22 @@ if __name__ ==  '__main__':
     if use_gpu:
         model = model.cuda()
     model.load_state_dict(torch.load('model_AlexNet.pkl'))
-
-    for i, data in enumerate(dataloaders['val']):
-        inputs, labels = data
-        # 判断是否使用gpu
-        if use_gpu:
-            inputs = inputs.cuda()
-            labels = labels.cuda()
-        inputs, labels = Variable(inputs), Variable(labels)
-        # 网络的前一部分
-        information = model.features(inputs)
-        # 拉成一维向量
-        information = information.view(information.size(0), -1)
-        # 提取倒数第二层的特征信息[0:5]
-        # 提取倒数第三层的特征信息[0:4]
-        # 提取网络的前半部分的特征信息model.features[0:n](information)
-        information = model.classifier[0:5](information)
-        print (information.shape)
+    model.eval()
+    # 取消测试阶段的梯度，避免out of memory
+    with torch.no_grad():
+        for i, data in enumerate(dataloaders['val']):
+            inputs, labels = data
+            # 判断是否使用gpu
+            if use_gpu:
+                inputs = inputs.cuda()
+                labels = labels.cuda()
+            inputs, labels = Variable(inputs), Variable(labels)
+            # 网络的前一部分
+            information = model.features(inputs)
+            # 拉成一维向量
+            information = information.view(information.size(0), -1)
+            # 提取倒数第二层的特征信息[0:5]
+            # 提取倒数第三层的特征信息[0:4]
+            # 提取网络的前半部分的特征信息model.features[0:n](information)
+            information = model.classifier[0:5](information)
+            print (information.shape)

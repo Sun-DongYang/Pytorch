@@ -21,14 +21,15 @@ net.load_state_dict(torch.load(r'model/1_model.pkl'))
 
 def deploy():
     # 验证阶段
-    # net.eval()
+    net.eval()
     total_correct = 0
-    for i, (images, labels) in enumerate(data_test_loader):
-        output = net(images)
-        # 计算准确率
-        pred = output.detach().max(1)[1]
-        total_correct += pred.eq(labels.view_as(pred)).sum()
-    print('Accuracy: %f' % ( float(total_correct) / len(data_test)))
+    with torch.no_grad():
+        for i, (images, labels) in enumerate(data_test_loader):
+            output = net(images)
+            # 计算准确率
+            pred = output.detach().max(1)[1]
+            total_correct += pred.eq(labels.view_as(pred)).sum()
+        print('Accuracy: %f' % ( float(total_correct) / len(data_test)))
 
 
 def main():
