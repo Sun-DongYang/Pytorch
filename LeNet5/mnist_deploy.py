@@ -23,6 +23,7 @@ def deploy():
     # 验证阶段
     net.eval()
     total_correct = 0
+    # 取消测试阶段的梯度，避免out of memory
     with torch.no_grad():
         for i, (images, labels) in enumerate(data_test_loader):
             output = net(images)
