@@ -55,7 +55,7 @@ class my_Data_Set(nn.Module):
             line.rstrip()
             information = line.split()
             images.append(information[0])
-            labels.append([int(l) for l in information[1:len(information)]])
+            labels.append(information[1])
         self.images = images
         self.labels = labels
         self.transform = transform
