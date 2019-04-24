@@ -9,8 +9,8 @@ import time
 import os
 
 # 是否使用gpu运算
-# use_gpu = torch.cuda.is_available()
-use_gpu = False
+use_gpu = torch.cuda.is_available()
+
 # 定义数据的处理方式
 data_transforms = {
     'train': transforms.Compose([
