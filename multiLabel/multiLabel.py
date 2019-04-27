@@ -3,7 +3,6 @@ from torch.utils.data import Dataset, DataLoader
 import torch
 import torch.nn as nn
 from torch.optim import lr_scheduler
-from torch.autograd import Variable
 from torchvision import datasets, models, transforms
 import time
 import os
@@ -124,8 +123,6 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                         inputs = inputs.cuda()
                         labels = labels.cuda()
 
-                    inputs, labels = Variable(inputs), Variable(labels)
-
                     # 梯度清零
                     optimizer.zero_grad()
 
@@ -152,8 +149,6 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                         if use_gpu:
                             inputs = inputs.cuda()
                             labels = labels.cuda()
-
-                        inputs, labels = Variable(inputs), Variable(labels)
 
                         # 网络前向运行
                         outputs = model(inputs)
