@@ -3,7 +3,6 @@ from __future__ import print_function, division
 import torch
 import torch.nn as nn
 from torch.optim import lr_scheduler
-from torch.autograd import Variable
 from torchvision import datasets, models, transforms
 import time
 import os
@@ -61,12 +60,9 @@ def train(model, criterion, optimizer, scheduler, phase='train'):
         inputs, labels = data
 
         # 判断是否使用gpu
-        # if use_gpu:
-        #     inputs = inputs.cuda()
-        #     labels = labels.cuda()
-
-        inputs = Variable(inputs)
-        labels = Variable(labels)
+        if use_gpu:
+            inputs = inputs.cuda()
+            labels = labels.cuda()
 
         # 清除梯度
         optimizer.zero_grad()
@@ -102,12 +98,10 @@ def val(model, criterion, phase='val'):
         for data in dataloaders[phase]:
             inputs, labels = data
             # 判断是否使用gpu
-            # if use_gpu:
-            #     inputs = inputs.cuda()
-            #     labels = labels.cuda()
+            if use_gpu:
+                inputs = inputs.cuda()
+                labels = labels.cuda()
 
-            inputs = Variable(inputs)
-            labels = Variable(labels)
             # 模型前向运行
             outputs = model(inputs)
             # 获取预测结果
@@ -164,8 +158,8 @@ if __name__ ==  '__main__':
     # 修改最后一个全连接层的的输出数为2
     model_ft.fc = nn.Linear(num_ftrs, 2)
     # 是否使用gpu
-    # if use_gpu:
-    #     model_ft = model_ft.cuda()
+    if use_gpu:
+        model_ft = model_ft.cuda()
 
     # 定义网络模型的损失函数
     criterion = nn.CrossEntropyLoss()
