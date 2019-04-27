@@ -81,8 +81,6 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                     inputs = inputs.cuda()
                     labels = labels.cuda()
 
-                inputs, labels = Variable(inputs), Variable(labels)
-
                 # 梯度清零
                 optimizer.zero_grad()
 

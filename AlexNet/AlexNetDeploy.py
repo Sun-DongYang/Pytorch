@@ -66,7 +66,6 @@ if __name__ ==  '__main__':
             if use_gpu:
                 inputs = inputs.cuda()
                 labels = labels.cuda()
-            inputs, labels = Variable(inputs), Variable(labels)
             # 网络的前一部分
             information = model.features(inputs)
             # 拉成一维向量
