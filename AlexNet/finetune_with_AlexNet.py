@@ -3,7 +3,6 @@ from __future__ import print_function, division
 import torch
 import torch.nn as nn
 from torch.optim import lr_scheduler
-from torch.autograd import Variable
 from torchvision import datasets, models, transforms
 import time
 import os
