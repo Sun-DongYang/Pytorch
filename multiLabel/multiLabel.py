@@ -61,6 +61,7 @@ class my_Data_Set(nn.Module):
             line.rstrip()
             information = line.split()
             images.append(information[0])
+            # 将标签信息由str类型转换为float类型
             labels.append([float(l) for l in information[1:len(information)]])
         self.images = images
         self.labels = labels
@@ -78,6 +79,7 @@ class my_Data_Set(nn.Module):
         # 处理图像数据
         if self.transform is not None:
             image = self.transform(image)
+        # 需要将标签转换为float类型，BCELoss只接受float类型
         label = torch.FloatTensor(label)
         return image, label
 
@@ -154,6 +156,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                         outputs = model(inputs)
                         _, preds = torch.max(outputs.data, 1)
                         # 计算Loss值
+                        # BCELoss的输入（1、网络模型的输出必须经过sigmoid；2、标签必须是float类型的tensor）
                         loss = criterion(Sigmoid_fun(outputs), labels)
                         # 计算一个epoch的loss值和准确率
                         running_loss += loss.item() * inputs.size(0)
