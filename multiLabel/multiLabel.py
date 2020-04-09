@@ -154,7 +154,6 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
                         # 网络前向运行
                         outputs = model(inputs)
-                        _, preds = torch.max(outputs.data, 1)
                         # 计算Loss值
                         # BCELoss的输入（1、网络模型的输出必须经过sigmoid；2、标签必须是float类型的tensor）
                         loss = criterion(Sigmoid_fun(outputs), labels)
