@@ -109,6 +109,9 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         # 每训练一个epoch，验证一下网络模型
         for phase in ['train', 'val']:
             running_loss = 0.0
+            running_precision = 0.0
+            running_recall = 0.0
+            batch_num = 0
 
             if phase == 'train':
                 # 学习率更新方式
@@ -132,6 +135,13 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                     outputs = model(inputs)
                     # 计算Loss值
                     loss = criterion(Sigmoid_fun(outputs), labels)
+
+                    # 这里根据自己的需求选择模型预测结果准确率的函数
+                    precision, recall = calculate_acuracy_mode_one(Sigmoid_fun(outputs), labels)
+                    # precision, recall = calculate_acuracy_mode_two(Sigmoid_fun(outputs), labels)
+                    running_precision += precision
+                    running_recall += recall
+                    batch_num += 1
                     # 反传梯度
                     loss.backward()
                     # 更新权重
@@ -160,14 +170,64 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                         # 计算一个epoch的loss值和准确率
                         running_loss += loss.item() * inputs.size(0)
 
+                        # 这里根据自己的需求选择模型预测结果准确率的函数
+                        precision, recall = calculate_acuracy_mode_one(Sigmoid_fun(outputs), labels)
+                        # precision, recall = calculate_acuracy_mode_two(Sigmoid_fun(outputs), labels)
+                        running_precision += precision
+                        running_recall += recall
+                        batch_num += 1
+
             # 计算Loss和准确率的均值
             epoch_loss = running_loss / dataset_sizes[phase]
             print('{} Loss: {:.4f} '.format(phase, epoch_loss))
+            epoch_precision = running_precision / batch_num
+            print('{} Precision: {:.4f} '.format(phase, epoch_precision))
+            epoch_recall = running_recall / batch_num
+            print('{} Recall: {:.4f} '.format(phase, epoch_recall))
             torch.save(model.state_dict(),'The_'+ str(epoch) + '_epoch_model.pkl'"Themodel_AlexNet.pkl")
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(
         time_elapsed // 60, time_elapsed % 60))
 
+# 计算准确率——方式1
+# 设定一个阈值，当预测的概率值大于这个阈值，则认为这幅图像中含有这类标签
+def calculate_acuracy_mode_one(model_pred, labels):
+    # 注意这里的model_pred是经过sigmoid处理的，sigmoid处理后可以视为预测是这一类的概率
+    # 预测结果，大于这个阈值则视为预测正确
+    accuracy_th = 0.5
+    pred_result = model_pred > accuracy_th
+    pred_result = pred_result.float()
+    pred_one_num = torch.sum(pred_result)
+    if pred_one_num == 0:
+        return 0, 0
+    target_one_num = torch.sum(labels)
+    true_predict_num = torch.sum(pred_result * labels)
+    # 模型预测的结果中有多少个是正确的
+    precision = true_predict_num / pred_one_num
+    # 模型预测正确的结果中，占所有真实标签的数量
+    recall = true_predict_num / target_one_num
+
+    return precision.item(), recall.item()
+
+# 计算准确率——方式2
+# 取预测概率最大的前top个标签，作为模型的预测结果
+def calculate_acuracy_mode_two(model_pred, labels):
+    # 取前top个预测结果作为模型的预测结果
+    precision = 0
+    recall = 0
+    top = 5
+    # 对预测结果进行按概率值进行降序排列，取概率最大的top个结果作为模型的预测结果
+    pred_label_locate = torch.argsort(model_pred, descending=True)[:, 0:top]
+    for i in range(model_pred.shape[0]):
+        temp_label = torch.zeros(1, model_pred.shape[1])
+        temp_label[0,pred_label_locate[i]] = 1
+        target_one_num = torch.sum(labels[i])
+        true_predict_num = torch.sum(temp_label * labels[i])
+        # 对每一幅图像进行预测准确率的计算
+        precision += true_predict_num / top
+        # 对每一幅图像进行预测查全率的计算
+        recall += true_predict_num / target_one_num
+    return precision, recall
 # 精调AlexNet
 if __name__ ==  '__main__':
 
