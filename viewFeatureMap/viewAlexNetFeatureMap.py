@@ -1,10 +1,7 @@
 import torch
-import torch.nn as nn
-from torchvision import datasets, models, transforms
-import os
+from torchvision import models, transforms
 from PIL import Image
 import matplotlib.pyplot as plt
-import cv2
 import numpy as np
 import scipy.misc
 
@@ -43,9 +40,9 @@ def show_feature_map(feature_map):
     plt.figure()
     for index in range(1, feature_map_num+1):
         plt.subplot(row_num, row_num, index)
-        plt.imshow(feature_map[0], cmap='gray')
+        plt.imshow(feature_map[index-1], cmap='gray')
         plt.axis('off')
-        scipy.misc.imsave(str(index)+".png", feature_map[0])
+        scipy.misc.imsave(str(index)+".png", feature_map[index-1])
     plt.show()
 
 
@@ -60,6 +57,7 @@ if __name__ ==  '__main__':
     model = models.alexnet(pretrained=True)
     # 是否使用gpu运算
     use_gpu = torch.cuda.is_available()
+    use_gpu =False
     # 读取图像信息
     image_info = get_image_info(image_dir)
     # 判断是否使用gpu
@@ -72,8 +70,3 @@ if __name__ ==  '__main__':
     feature_map = get_k_layer_feature_map(feature_extractor, k, image_info)
     show_feature_map(feature_map)
 
-
-    # plt.figure()
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(image_info)
-    # plt.show()
